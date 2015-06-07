@@ -17,7 +17,7 @@ cursor = agent.cursor()
 def is_group_exist(link):
 	global cursor
 	sql = "SELECT EXISTS( SELECT 1 FROM groups WHERE link = %s )"
-	cursor.execute(sql, link)
+	cursor.execute(sql, [link])
 	return cursor.fetchone()[0]
 
 def set_time_zone(time_zone_str):
@@ -26,7 +26,7 @@ def set_time_zone(time_zone_str):
 
 def add_group(name, link):
 	global agent
-	values = (name, link)
+	values = [name, link]
 	sql = 	u"INSERT INTO groups (name,link,created_at,updated_at) "\
 			"VALUES (%s,%s,now(),now())"
 
@@ -35,7 +35,7 @@ def add_group(name, link):
 
 def add_weapon(name, link, img_link, group_id):
 	global cursor
-	values = ( unicode(name), unicode(link), unicode(img_link), group_id)
+	values = [ unicode(name), unicode(link), unicode(img_link), group_id ]
 	sql = 	u"INSERT INTO weapons (name,link,img_link,group_id,created_at,updated_at) "\
 			"VALUES (%s,%s,%s,%s,now(),now())"
 
@@ -73,7 +73,7 @@ def get_group_link(group_id):
 	global cursor
 	sql = 	"SELECT link FROM groups WHERE id = %s"
 
-	cursor.execute(sql, group_id)
+	cursor.execute(sql, [group_id])
 	result = cursor.fetchone()
 	if result and len(result) > 0:
 		return result[0]
@@ -84,7 +84,7 @@ def get_weapon(weapon_id):
 	global cursor
 	sql =	"SELECT name, link, group_id, last_price, avg_price"\
 			" FROM weapons WHERE id = %s"
-	cursor.execute(sql, weapon_id)
+	cursor.execute(sql, [weapon_id])
 	row = cursor.fetchone()
 	weapon = {}
 	if row and len(row) > 0:
@@ -101,7 +101,7 @@ def get_weapon(weapon_id):
 def update_prices(weapon_id, last_price, avg_price):
 	global cursor
 	sql = "UPDATE weapons SET last_price = %s, avg_price = %s, updated_at=now() WHERE id = %s"
-	values = (last_price, avg_price, weapon_id)
+	values = [last_price, avg_price, weapon_id]
 	cursor.execute(sql, values)
 
 def get_weapons():
@@ -144,8 +144,8 @@ def alert_price(weapon, price):
 
 def add_notification(weapon_id, content):
 	global cursor
-	values = (	unicode(content), 
-				weapon_id )
+	values = [	unicode(content), 
+				weapon_id ]
 	sql = 	u"INSERT INTO notifications (content,weapon_id,created_at,updated_at) "\
 			"VALUES (%s,%s,now(),now())"
 
@@ -156,7 +156,7 @@ def set_alert_status(weapon_id, alert_name, is_active):
 	global cursor
 	alert_column_name = "is_alert_%s_active" % alert_name
 	sql = "UPDATE weapons SET "+alert_column_name+" = %s WHERE id = %s"
-	values = (is_active, weapon_id)
+	values = [is_active, weapon_id]
 	cursor.execute(sql, values)
 
 
